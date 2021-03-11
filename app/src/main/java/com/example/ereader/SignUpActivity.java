@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,16 +14,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignUpActivity extends AppCompatActivity {
+
+    public static final String TAG = "TAG";
 
     EditText email, password, username, cPassword;
     Button btnSignup;
     TextView backToLogin;
     FirebaseAuth fAuth;
+    FirebaseFirestore fStore;
+    String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +47,7 @@ public class SignUpActivity extends AppCompatActivity {
         backToLogin=findViewById(R.id.backToLogin);
 
         fAuth = FirebaseAuth.getInstance();
+        fStore = FirebaseFirestore.getInstance();
 
         backToLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,6 +66,7 @@ public class SignUpActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String Email = email.getText().toString().trim();
                 String Password = password.getText().toString().trim();
+                String FullName = username.getText().toString().trim();
 
                 if(TextUtils.isEmpty(Email)){
                     email.setError("Email is Required");
@@ -73,6 +86,17 @@ public class SignUpActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             Toast.makeText(SignUpActivity.this, "User Created", Toast.LENGTH_SHORT).show();
+                            userID = fAuth.getCurrentUser().getUid();
+                            DocumentReference documentReference = fStore.collection("users").document(userID);
+                            Map<String, Object> user = new HashMap<>();
+                            user.put("name", FullName);
+                            user.put("email", Email);
+                            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "onSuccess: User profile is created for " + userID);
+                                }
+                            });
                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
                         }
                         else{
