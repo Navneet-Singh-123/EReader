@@ -28,7 +28,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     public static final String TAG = "TAG";
 
-    EditText email, password, username, cPassword;
+    EditText email, password, username, cPassword, phone;
     Button btnSignup;
     TextView backToLogin;
     FirebaseAuth fAuth;
@@ -45,6 +45,7 @@ public class SignUpActivity extends AppCompatActivity {
         username=findViewById(R.id.username);
         btnSignup=findViewById(R.id.btn_register);
         backToLogin=findViewById(R.id.backToLogin);
+        phone=findViewById(R.id.phone);
 
         fAuth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
@@ -67,6 +68,8 @@ public class SignUpActivity extends AppCompatActivity {
                 String Email = email.getText().toString().trim();
                 String Password = password.getText().toString().trim();
                 String FullName = username.getText().toString().trim();
+                String Phone    = phone.getText().toString();
+
 
                 if(TextUtils.isEmpty(Email)){
                     email.setError("Email is Required");
@@ -77,7 +80,7 @@ public class SignUpActivity extends AppCompatActivity {
                     return;
                 }
                 if(Password.length() < 6){
-                    password.setError("Password must have atleast 6 characters");
+                    password.setError("Password must have at least 6 characters");
                     return;
                 }
 
@@ -91,6 +94,8 @@ public class SignUpActivity extends AppCompatActivity {
                             Map<String, Object> user = new HashMap<>();
                             user.put("name", FullName);
                             user.put("email", Email);
+                            user.put("phone", Phone);
+
                             documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
