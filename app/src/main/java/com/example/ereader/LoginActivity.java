@@ -62,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        
+
         ForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
