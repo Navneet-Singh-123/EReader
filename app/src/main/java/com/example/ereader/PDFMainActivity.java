@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class PDFMainActivity extends AppCompatActivity {
@@ -17,11 +18,15 @@ public class PDFMainActivity extends AppCompatActivity {
     FloatingActionButton fb;
     RecyclerView recview;
     myadapter adapter;
+    DatabaseReference likereference;
+    Boolean testclick=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_p_d_f_main);
+
+        likereference=FirebaseDatabase.getInstance().getReference("likes");
 
         fb=(FloatingActionButton)findViewById(R.id.floatingActionButton);
         fb.setOnClickListener(view -> {
@@ -35,7 +40,7 @@ public class PDFMainActivity extends AppCompatActivity {
                 new FirebaseRecyclerOptions.Builder<model>()
                         .setQuery(FirebaseDatabase.getInstance().getReference().child("mydocuments"), model.class)
                         .build();
-        adapter=new myadapter(options);
+        adapter=new myadapter(options, likereference, testclick);
         recview.setAdapter(adapter);
 
     }

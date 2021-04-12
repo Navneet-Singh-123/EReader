@@ -47,28 +47,16 @@
             android:layout_marginTop="4dp"
             android:layout_toRightOf="@id/img1">
 
-            <ImageView
-                android:id="@+id/readbook"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_margin="10dp"
-                android:src="@drawable/readbook" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:id="@+id/textviewbook"
-                android:text="3000K"
-                android:textStyle="bold"
-                android:textColor="#fff"
-                android:textSize="15sp"/>
+
+
 
             <ImageView
-                android:id="@+id/likebook"
+                android:id="@+id/like_btn"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_margin="10dp"
-                android:src="@drawable/like" />
+                android:src="@drawable/ic_baseline_favorite_border_24"/>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -79,21 +67,8 @@
                 android:textColor="#fff"
                 android:textSize="15sp"/>
 
-            <ImageView
-                android:id="@+id/dislikebook"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_margin="10dp"
-                android:src="@drawable/dislike" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:id="@+id/textdislike"
-                android:text="120"
-                android:textStyle="bold"
-                android:textColor="#fff"
-                android:textSize="15sp"/>
+
+
 
         </LinearLayout>
 

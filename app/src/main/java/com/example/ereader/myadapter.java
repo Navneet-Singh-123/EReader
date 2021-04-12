@@ -1,6 +1,7 @@
 package com.example.ereader;
 
 import android.content.Intent;
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,22 +13,62 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class myadapter extends FirebaseRecyclerAdapter<model,myadapter.myviewholder>
 {
+    DatabaseReference likereference;
+    Boolean testclick;
 
-    public myadapter(@NonNull FirebaseRecyclerOptions<model> options) {
+    public myadapter(@NonNull FirebaseRecyclerOptions<model> options, DatabaseReference likereference, Boolean testclick) {
         super(options);
+        this.likereference=likereference;
+        this.testclick=testclick;
     }
 
     @Override
     protected void onBindViewHolder(@NonNull final myviewholder holder, int position, @NonNull final model model) {
 
-        holder.header.setText(model.getFilename());
+        FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
+        String userID=firebaseUser.getUid();
+        String postkey=getRef(position).getKey();
 
-        holder.textviewbook.setText(String.valueOf(model.getNov()));
-        holder.textlike.setText(String.valueOf(model.getNol()));
-        holder.textdislike.setText(String.valueOf(model.getNod()));
+        holder.getlikebuttonstatus(postkey, userID);
+
+        holder.likebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                testclick=true;
+                likereference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(testclick==true){
+                            if(snapshot.child(postkey).hasChild(userID)){
+                                likereference.child(postkey).removeValue();
+                                testclick=false;
+                            }
+                            else{
+                                likereference.child(postkey).child(userID).setValue(true);
+                                testclick=false;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        });
+
+        holder.header.setText(model.getFilename());
 
         holder.img1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,8 +95,9 @@ public class myadapter extends FirebaseRecyclerAdapter<model,myadapter.myviewhol
     {
         ImageView img1;
         TextView header;
-        ImageView readbook,likebook,dislikebook;
-        TextView textviewbook,textlike,textdislike;
+        ImageView likebook;
+        TextView textlike;
+        DatabaseReference likereference;
 
         public myviewholder(@NonNull View itemView)
         {
@@ -64,13 +106,33 @@ public class myadapter extends FirebaseRecyclerAdapter<model,myadapter.myviewhol
             img1=itemView.findViewById(R.id.img1);
             header=itemView.findViewById(R.id.header);
 
-            readbook=itemView.findViewById(R.id.readbook);
-            likebook=itemView.findViewById(R.id.likebook);
-            dislikebook=itemView.findViewById(R.id.dislikebook);
+            likebook=itemView.findViewById(R.id.like_btn);
 
-            textviewbook=itemView.findViewById(R.id.textviewbook);
             textlike=itemView.findViewById(R.id.textlike);
-            textdislike=itemView.findViewById(R.id.textdislike);
+        }
+
+        public void getlikebuttonstatus(final String postkey, final String userID){
+            likereference= FirebaseDatabase.getInstance().getReference("likes");
+            likereference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.child(postkey).hasChild(userID)){
+                        int likecount=(int)snapshot.child(postkey).getChildrenCount();
+                        textlike.setText(likecount+" likes");
+                        likebook.setImageResource(R.drawable.ic_baseline_favorite_24);
+                    }
+                    else{
+                        int likecount=(int)snapshot.child(postkey).getChildrenCount();
+                        textlike.setText(likecount+" likes");
+                        likebook.setImageResource(R.drawable.ic_baseline_favorite_border_24);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
         }
     }
 }

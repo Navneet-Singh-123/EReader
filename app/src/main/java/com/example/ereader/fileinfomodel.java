@@ -2,6 +2,7 @@ package com.example.ereader;
 
 public class fileinfomodel {
     String filename, fileurl;
+    int views;
 
     public fileinfomodel(String filename, String fileurl) {
         this.filename = filename;
